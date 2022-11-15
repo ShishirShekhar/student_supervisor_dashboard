@@ -1,5 +1,6 @@
 # Import all the required modules
-from tkinter import Tk, Label, Entry, Button
+from tkinter import Tk, Label, Entry, Button, messagebox
+import sqlite3 as sql
 from new_student import new_student
 
 
@@ -27,7 +28,7 @@ def student_login():
     password_entry.place(x=200, y=150)
     
     # Create a button for login
-    login_btn = Button(window, text="Login")
+    login_btn = Button(window, text="Login", command=lambda: login(username_entry, password_entry))
     login_btn.place(x=200, y=200, width=200)
     
     # Create a button for new user
@@ -36,3 +37,30 @@ def student_login():
     
     # Run the login window
     window.mainloop()
+    
+
+# Create a function to login
+def login(user, pswd):
+    # Check if user and password are given
+    if user and pswd:
+        # Connect to the database
+        db = sql.connect(database="student.db")
+        # Create a cursor
+        cur = db.cursor()
+        
+        # Select the username and password from the database
+        cur.execute(f"SELECT * FROM Student WHERE registration='{user.get()}' AND password='{pswd.get()}'")
+        # Fetch the data
+        row = cur.fetchone()
+        
+        # Check if user is found
+        if row:
+            # Show a message
+            messagebox.showinfo("Login", "Login Successful")
+        else:
+            # Show a success message
+            messagebox.showerror("Login", "Login Failed")
+    else:
+        # Show an error message
+        messagebox.showerror("Error", "Please enter username and password")
+        
